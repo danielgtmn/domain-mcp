@@ -15,7 +15,7 @@ It uses **RDAP** first (structured JSON from registries) and falls back to **WHO
 | [Installation](Installation) | Install from source, Docker, or run with `uv` |
 | [Configuration](Configuration) | MCP client configs (Claude, Cursor, Docker) |
 | [Tools](Tools) | MCP tools, parameters, and response fields |
-| [Supported TLDs](Supported-TLDs) | How TLD coverage works (RDAP + WHOIS) |
+| [Supported TLDs](Supported-TLDs) | Full table of **1,200+** RDAP TLDs + WHOIS notes |
 | [Architecture](Architecture) | How checks work under the hood |
 | [Docker](Docker) | Images, tags, and release pipeline |
 | [FAQ](FAQ) | Common questions and caveats |

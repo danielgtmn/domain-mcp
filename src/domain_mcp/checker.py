@@ -127,7 +127,7 @@ class DomainChecker:
             self._cache.clear()
 
     def supported_tlds(self) -> list[str]:
-        """Return TLDs listed in the IANA RDAP DNS bootstrap file."""
+        """Return TLDs with known RDAP endpoints (IANA bootstrap + overrides)."""
         ensure_bootstrap()
         tlds: set[str] = set()
         try:
@@ -140,6 +140,13 @@ class DomainChecker:
                     tlds.add(str(tld).lower())
         except Exception as exc:  # noqa: BLE001
             logger.warning("Could not list TLDs from IANA: %s", exc)
+        try:
+            from whoisit.overrides import iana_overrides
+
+            for tld in (iana_overrides.get("domain") or {}):
+                tlds.add(str(tld).lower())
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("Could not merge whoisit overrides: %s", exc)
         return sorted(tlds)
 
     def has_rdap(self, tld: str) -> bool:

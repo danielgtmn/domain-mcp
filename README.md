@@ -406,8 +406,14 @@ domain-mcp does **not** hardcode a small TLD list:
 | **RDAP** | ~1,200 TLDs from IANA + overrides (e.g. `.de`) |
 | **WHOIS** | Fallback via IANA `whois:` referral for most other TLDs |
 
-Runtime list of RDAP TLDs: tool `list_supported_tlds`.  
-Details: [docs/Supported-TLDs.md](docs/Supported-TLDs.md) · [Wiki](https://github.com/danielgtmn/domain-mcp/wiki/Supported-TLDs)
+Full wiki table (1,200+ TLDs + RDAP URLs):  
+[docs/Supported-TLDs.md](docs/Supported-TLDs.md) · [Wiki · Supported-TLDs](https://github.com/danielgtmn/domain-mcp/wiki/Supported-TLDs)
+
+Live list via tool `list_supported_tlds`. Regenerate docs:
+
+```bash
+uv run python scripts/generate_supported_tlds.py
+```
 
 ## How it works
 

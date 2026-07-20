@@ -196,6 +196,7 @@ def list_supported_tlds() -> dict[str, Any]:
         "count": len(tlds),
         "source": "IANA RDAP bootstrap (dns.json) + whoisit overrides",
         "whois_fallback": True,
+        "wiki": "https://github.com/danielgtmn/domain-mcp/wiki/Supported-TLDs",
         "tlds": tlds,
     }
 
