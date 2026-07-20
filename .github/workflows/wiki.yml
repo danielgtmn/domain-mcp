@@ -1,0 +1,35 @@
+name: Publish Wiki
+
+# Copies docs/*.md into the GitHub Wiki whenever docs change on main.
+# Prerequisite: enable Wiki on the repo (Settings → Features → Wikis)
+# and create an initial empty page once so the wiki git remote exists.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/wiki.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: wiki-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Sync docs/ → wiki
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Publish docs to GitHub Wiki
+        uses: spenserblack/actions-wiki@v0.3.0
+        with:
+          path: docs
+          # Default token can push to the repo wiki when contents: write is set.
+          token: ${{ secrets.GITHUB_TOKEN }}

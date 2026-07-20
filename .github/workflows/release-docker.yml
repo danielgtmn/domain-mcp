@@ -1,0 +1,136 @@
+name: Release Docker Image
+
+# Builds and pushes a multi-arch image to GHCR when a GitHub Release is published.
+# Image tags follow the release version, e.g. release v1.2.3 →
+#   ghcr.io/<owner>/domain-mcp:1.2.3
+#   ghcr.io/<owner>/domain-mcp:1.2
+#   ghcr.io/<owner>/domain-mcp:1
+#   ghcr.io/<owner>/domain-mcp:v1.2.3
+#   ghcr.io/<owner>/domain-mcp:latest   (only for non-prerelease)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Version tag to build (e.g. v0.1.0). Defaults to latest release tag if empty."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: release-docker-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  docker:
+    name: Build & push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+
+      - name: Resolve version
+        id: meta_version
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "release" ]; then
+            RAW="${{ github.event.release.tag_name }}"
+            PRERELEASE="${{ github.event.release.prerelease }}"
+          else
+            RAW="${{ inputs.tag }}"
+            if [ -z "$RAW" ]; then
+              RAW="$(gh release view --json tagName -q .tagName)"
+            fi
+            PRERELEASE="false"
+          fi
+          # Strip leading v for docker "semver" tags; keep original for v-prefixed tag.
+          VERSION="${RAW#v}"
+          if [ -z "$VERSION" ]; then
+            echo "Could not resolve version from tag" >&2
+            exit 1
+          fi
+          echo "raw=$RAW" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$PRERELEASE" >> "$GITHUB_OUTPUT"
+          echo "Resolved version=$VERSION (raw=$RAW, prerelease=$PRERELEASE)"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ steps.meta_version.outputs.version }}
+            type=raw,value=${{ steps.meta_version.outputs.raw }}
+            type=semver,pattern={{version}},value=${{ steps.meta_version.outputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.meta_version.outputs.version }}
+            type=semver,pattern={{major}},value=${{ steps.meta_version.outputs.version }},enable=${{ steps.meta_version.outputs.prerelease != 'true' }}
+            type=raw,value=latest,enable=${{ steps.meta_version.outputs.prerelease != 'true' }}
+          labels: |
+            org.opencontainers.image.title=domain-mcp
+            org.opencontainers.image.description=MCP server for domain availability checks (RDAP + WHOIS)
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.version=${{ steps.meta_version.outputs.version }}
+            org.opencontainers.image.licenses=MIT
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+      - name: Summary
+        run: |
+          {
+            echo "## Docker image published"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| **Version** | \`${{ steps.meta_version.outputs.version }}\` |"
+            echo "| **Release tag** | \`${{ steps.meta_version.outputs.raw }}\` |"
+            echo "| **Image** | \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}\` |"
+            echo ""
+            echo "### Tags"
+            echo '```'
+            echo "${{ steps.meta.outputs.tags }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

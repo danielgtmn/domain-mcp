@@ -1,0 +1,63 @@
+[project]
+name = "domain-mcp"
+version = "0.1.0"
+description = "MCP server for domain availability checks (RDAP + WHOIS)"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Daniel Gietmann", email = "daniel@gietmanic.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "cachetools>=7.1.4",
+    "httpx>=0.28.1",
+    "idna>=3.18",
+    "mcp[cli]>=1.28.1",
+    "whoisit>=4.0.4",
+]
+keywords = ["mcp", "domain", "rdap", "whois", "availability", "dns"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: Name Service (DNS)",
+    "Topic :: System :: Networking",
+]
+
+[project.urls]
+Homepage = "https://github.com/danielgtmn/domain-mcp"
+Documentation = "https://github.com/danielgtmn/domain-mcp/wiki"
+Repository = "https://github.com/danielgtmn/domain-mcp"
+Issues = "https://github.com/danielgtmn/domain-mcp/issues"
+Changelog = "https://github.com/danielgtmn/domain-mcp/releases"
+
+[project.scripts]
+domain-mcp = "domain_mcp:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "network: tests that hit public RDAP/WHOIS servers",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+
+[build-system]
+requires = ["uv_build>=0.9.18,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "ruff>=0.15.22",
+]
