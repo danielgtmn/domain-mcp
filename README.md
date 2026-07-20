@@ -33,14 +33,37 @@ uv sync
 uv run domain-mcp
 ```
 
-### Docker
+### Hosted MCP (recommended)
+
+Remote Streamable HTTP endpoint:
+
+```text
+https://domain-mcp.gietmanic.com/mcp
+```
+
+```json
+{
+  "mcpServers": {
+    "domain-mcp": {
+      "url": "https://domain-mcp.gietmanic.com/mcp"
+    }
+  }
+}
+```
+
+Health: https://domain-mcp.gietmanic.com/health
+
+### Docker (self-host HTTP)
 
 ```bash
 docker pull ghcr.io/danielgtmn/domain-mcp:latest
-docker run -i --rm ghcr.io/danielgtmn/domain-mcp:latest
+docker run --rm -p 8000:8000 ghcr.io/danielgtmn/domain-mcp:latest
+# → http://localhost:8000/mcp
 ```
 
-### MCP client (Claude / Cursor)
+For local stdio instead: `-e MCP_TRANSPORT=stdio` and keep `-i`.
+
+### MCP client (local stdio)
 
 ```json
 {
@@ -52,24 +75,6 @@ docker run -i --rm ghcr.io/danielgtmn/domain-mcp:latest
         "/absolute/path/to/domain-mcp",
         "run",
         "domain-mcp"
-      ]
-    }
-  }
-}
-```
-
-Docker-based config:
-
-```json
-{
-  "mcpServers": {
-    "domain-mcp": {
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "ghcr.io/danielgtmn/domain-mcp:latest"
       ]
     }
   }

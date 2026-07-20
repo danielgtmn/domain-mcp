@@ -31,9 +31,20 @@ COPY --from=builder --chown=appuser:appuser /app/pyproject.toml /app/README.md /
 
 ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+    PYTHONDONTWRITEBYTECODE=1 \
+    MCP_TRANSPORT=streamable-http \
+    MCP_HOST=0.0.0.0 \
+    MCP_PORT=8000 \
+    MCP_PATH=/mcp \
+    MCP_PUBLIC_HOST=domain-mcp.gietmanic.com \
+    MCP_STATELESS_HTTP=true
 
 USER appuser
 
-# MCP over stdio — keep the container attached to the client process.
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"
+
+# Remote MCP (Streamable HTTP). For local stdio: -e MCP_TRANSPORT=stdio
 ENTRYPOINT ["domain-mcp"]

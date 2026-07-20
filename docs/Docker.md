@@ -24,18 +24,41 @@ Prereleases (GitHub “This is a pre-release”) skip `latest` and the bare majo
 
 ## Pull & run
 
+### Remote MCP (HTTP) — default image mode
+
 ```bash
 docker pull ghcr.io/danielgtmn/domain-mcp:latest
 
-# stdio MCP — keep -i so the client can talk to the process
-docker run -i --rm ghcr.io/danielgtmn/domain-mcp:0.1.0
+docker run --rm -p 8000:8000 \
+  -e MCP_PUBLIC_HOST=domain-mcp.gietmanic.com \
+  ghcr.io/danielgtmn/domain-mcp:0.1.0
 ```
+
+- MCP: `http://localhost:8000/mcp`
+- Health: `http://localhost:8000/health`
+- Optional: `-e DOMAIN_MCP_API_KEY=secret`
+
+### Local stdio
+
+```bash
+docker run -i --rm -e MCP_TRANSPORT=stdio ghcr.io/danielgtmn/domain-mcp:latest
+```
+
+## Production host
+
+Deployed on Coolify (**webtropia-01**) as Streamable HTTP:
+
+```text
+https://domain-mcp.gietmanic.com/mcp
+```
+
+DNS: `domain-mcp.gietmanic.com` → `85.114.138.221` (`gietmanic-networking`).
 
 ## Build locally
 
 ```bash
 docker build -t domain-mcp:local .
-docker run -i --rm domain-mcp:local
+docker run --rm -p 8000:8000 domain-mcp:local
 ```
 
 ## Release pipeline
