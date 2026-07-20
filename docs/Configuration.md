@@ -4,22 +4,30 @@ domain-mcp supports two modes:
 
 | Mode | When | Endpoint |
 |------|------|----------|
-| **stdio** (default) | Local clients, `uv run domain-mcp` | process stdin/stdout |
-| **streamable-http** | Remote host (Coolify, Docker) | `https://…/mcp` |
+| **stdio** (default locally) | Local clients, `uv run domain-mcp` | process stdin/stdout |
+| **streamable-http** | Hosted / Docker / Coolify | `https://…/mcp` |
 
 ## Hosted instance
-
-Public remote MCP (when deployed):
 
 ```text
 https://domain-mcp.gietmanic.com/mcp
 ```
 
-Health check: `https://domain-mcp.gietmanic.com/health`
+| Check | URL |
+|-------|-----|
+| MCP | https://domain-mcp.gietmanic.com/mcp |
+| Health | https://domain-mcp.gietmanic.com/health |
+| Info | https://domain-mcp.gietmanic.com/ |
 
-### Remote client config (URL)
+### Install on every major client
 
-Clients that support Streamable HTTP MCP:
+Copy-paste configs for **Cursor, Claude Desktop, Claude Code, VS Code, Windsurf, Cline/Roo, Continue, Zed, JetBrains**, plus the `mcp-remote` bridge and API-key examples, live in the project README:
+
+→ **[README · Install remote MCP (hosted)](https://github.com/danielgtmn/domain-mcp#install-remote-mcp-hosted)**
+
+Minimal patterns:
+
+**Native HTTP URL**
 
 ```json
 {
@@ -31,7 +39,30 @@ Clients that support Streamable HTTP MCP:
 }
 ```
 
-If an API key is configured on the server (`DOMAIN_MCP_API_KEY`):
+**Stdio bridge** (Claude Desktop and other stdio-only hosts; needs Node 18+)
+
+```json
+{
+  "mcpServers": {
+    "domain-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://domain-mcp.gietmanic.com/mcp"
+      ]
+    }
+  }
+}
+```
+
+**Claude Code**
+
+```bash
+claude mcp add --transport http domain-mcp https://domain-mcp.gietmanic.com/mcp
+```
+
+**Optional API key** (`DOMAIN_MCP_API_KEY` on the server)
 
 ```json
 {
@@ -41,19 +72,6 @@ If an API key is configured on the server (`DOMAIN_MCP_API_KEY`):
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
       }
-    }
-  }
-}
-```
-
-Claude Desktop (stdio-only) can use a bridge:
-
-```json
-{
-  "mcpServers": {
-    "domain-mcp": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote", "https://domain-mcp.gietmanic.com/mcp"]
     }
   }
 }
@@ -73,9 +91,9 @@ Claude Desktop (stdio-only) can use a bridge:
 | `MCP_ALLOWED_HOSTS` | _(derived)_ | Extra comma-separated Host values |
 | `MCP_ALLOWED_ORIGINS` | _(derived)_ | Extra comma-separated Origin values |
 
-## Local stdio (Claude Desktop / Cursor)
+Docker image defaults to `MCP_TRANSPORT=streamable-http` and `MCP_HOST=0.0.0.0`.
 
-Edit the Claude config file and add:
+## Local stdio
 
 ```json
 {
@@ -93,7 +111,7 @@ Edit the Claude config file and add:
 }
 ```
 
-Using the venv binary directly:
+Or the venv binary:
 
 ```json
 {
@@ -105,13 +123,13 @@ Using the venv binary directly:
 }
 ```
 
-## Cursor / other MCP hosts
-
-Same pattern: `command` + optional `args`. Ensure the process has outbound HTTPS (RDAP) and TCP/43 (WHOIS fallback).
+Ensure outbound HTTPS (RDAP) and TCP/43 (WHOIS fallback).
 
 ## Docker as MCP server
 
-Prefer the **hosted URL** or container HTTP mode (default). For stdio with Docker:
+HTTP (default image mode) — point clients at `http://localhost:8000/mcp`.
+
+stdio:
 
 ```json
 {
