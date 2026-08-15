@@ -17,7 +17,8 @@ https://domain.mcp.danielgtmn.com/mcp
 |-------|-----|
 | MCP | https://domain.mcp.danielgtmn.com/mcp |
 | Health | https://domain.mcp.danielgtmn.com/health |
-| Info | https://domain.mcp.danielgtmn.com/ |
+| Landing (browser) | https://domain.mcp.danielgtmn.com/ |
+| Info (JSON) | https://domain.mcp.danielgtmn.com/info |
 
 ### Install on every major client
 

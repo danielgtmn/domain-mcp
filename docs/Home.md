@@ -6,6 +6,8 @@ It uses **RDAP** first (structured JSON from registries) and falls back to **WHO
 
 **Hosted endpoint:** [https://domain.mcp.danielgtmn.com/mcp](https://domain.mcp.danielgtmn.com/mcp)
 
+Open [https://domain.mcp.danielgtmn.com/](https://domain.mcp.danielgtmn.com/) in a browser for the landing page (lookup + copy the MCP URL). JSON stays at `/info`.
+
 > Documentation in this wiki is generated from the [`docs/`](https://github.com/danielgtmn/domain-mcp/tree/main/docs) folder in the repository. Prefer pull requests there over editing the wiki UI.
 
 ## Quick links

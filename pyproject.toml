@@ -5,7 +5,7 @@ description = "MCP server for domain availability checks (RDAP + WHOIS)"
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
-    { name = "Daniel Gietmann", email = "daniel@gietmanic.com" }
+    { name = "Daniel Gietmann", email = "hello@danielgtmn.com" }
 ]
 requires-python = ">=3.11"
 dependencies = [
@@ -30,6 +30,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/danielgtmn/domain-mcp"
+Hosted = "https://domain.mcp.danielgtmn.com"
 Documentation = "https://github.com/danielgtmn/domain-mcp/wiki"
 Repository = "https://github.com/danielgtmn/domain-mcp"
 Issues = "https://github.com/danielgtmn/domain-mcp/issues"
