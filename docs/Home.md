@@ -4,7 +4,7 @@
 
 It uses **RDAP** first (structured JSON from registries) and falls back to **WHOIS** when a TLD has no RDAP endpoint.
 
-**Hosted endpoint:** [https://domain-mcp.gietmanic.com/mcp](https://domain-mcp.gietmanic.com/mcp)
+**Hosted endpoint:** [https://domain.mcp.danielgtmn.com/mcp](https://domain.mcp.danielgtmn.com/mcp)
 
 > Documentation in this wiki is generated from the [`docs/`](https://github.com/danielgtmn/domain-mcp/tree/main/docs) folder in the repository. Prefer pull requests there over editing the wiki UI.
 

@@ -2,7 +2,7 @@
 
 Two ways to use domain-mcp:
 
-1. **Hosted remote MCP** (no install) — [https://domain-mcp.gietmanic.com/mcp](https://domain-mcp.gietmanic.com/mcp)
+1. **Hosted remote MCP** (no install) — [https://domain.mcp.danielgtmn.com/mcp](https://domain.mcp.danielgtmn.com/mcp)
 2. **Local / self-hosted** — source, Docker, or your own deploy
 
 For full client-by-client remote setup (Cursor, Claude Desktop, VS Code, Windsurf, …), see the [README § Install remote MCP](https://github.com/danielgtmn/domain-mcp#install-remote-mcp-hosted) or [Configuration](Configuration).
@@ -10,10 +10,10 @@ For full client-by-client remote setup (Cursor, Claude Desktop, VS Code, Windsur
 ## Hosted (recommended)
 
 ```text
-https://domain-mcp.gietmanic.com/mcp
+https://domain.mcp.danielgtmn.com/mcp
 ```
 
-Health: https://domain-mcp.gietmanic.com/health
+Health: https://domain.mcp.danielgtmn.com/health
 
 Minimal config (clients with native HTTP MCP):
 
@@ -21,7 +21,7 @@ Minimal config (clients with native HTTP MCP):
 {
   "mcpServers": {
     "domain-mcp": {
-      "url": "https://domain-mcp.gietmanic.com/mcp"
+      "url": "https://domain.mcp.danielgtmn.com/mcp"
     }
   }
 }
@@ -34,7 +34,7 @@ Stdio-only clients (Claude Desktop, etc.):
   "mcpServers": {
     "domain-mcp": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://domain-mcp.gietmanic.com/mcp"]
+      "args": ["-y", "mcp-remote", "https://domain.mcp.danielgtmn.com/mcp"]
     }
   }
 }
@@ -43,7 +43,7 @@ Stdio-only clients (Claude Desktop, etc.):
 Claude Code:
 
 ```bash
-claude mcp add --transport http domain-mcp https://domain-mcp.gietmanic.com/mcp
+claude mcp add --transport http domain-mcp https://domain.mcp.danielgtmn.com/mcp
 ```
 
 ## Requirements (local)
@@ -91,7 +91,7 @@ See [Docker](Docker) for tags and Coolify hosting.
 Hosted:
 
 ```bash
-curl -sS https://domain-mcp.gietmanic.com/health
+curl -sS https://domain.mcp.danielgtmn.com/health
 ```
 
 Local library:
