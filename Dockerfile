@@ -40,7 +40,7 @@ ENV PATH="/app/.venv/bin:$PATH" \
     MCP_HOST=0.0.0.0 \
     MCP_PORT=8000 \
     MCP_PATH=/mcp \
-    MCP_PUBLIC_HOST=domain-mcp.gietmanic.com \
+    MCP_PUBLIC_HOST=domain.mcp.danielgtmn.com \
     MCP_STATELESS_HTTP=true
 
 USER appuser

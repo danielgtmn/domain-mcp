@@ -30,7 +30,7 @@ Prereleases (GitHub “This is a pre-release”) skip `latest` and the bare majo
 docker pull ghcr.io/danielgtmn/domain-mcp:latest
 
 docker run --rm -p 8000:8000 \
-  -e MCP_PUBLIC_HOST=domain-mcp.gietmanic.com \
+  -e MCP_PUBLIC_HOST=domain.mcp.danielgtmn.com \
   ghcr.io/danielgtmn/domain-mcp:0.1.0
 ```
 
@@ -46,13 +46,14 @@ docker run -i --rm -e MCP_TRANSPORT=stdio ghcr.io/danielgtmn/domain-mcp:latest
 
 ## Production host
 
-Deployed on Coolify (**webtropia-01**) as Streamable HTTP:
+Deployed on Coolify (**app01**) as Streamable HTTP:
 
 ```text
-https://domain-mcp.gietmanic.com/mcp
+https://domain.mcp.danielgtmn.com/mcp
 ```
 
-DNS: `domain-mcp.gietmanic.com` → `85.114.138.221` (`gietmanic-networking`).
+DNS: `domain.mcp.danielgtmn.com` → `159.195.33.243` (`gietmanic-networking`).
+The previous host `domain-mcp.gietmanic.com` stays as an alias.
 
 ## Build locally
 

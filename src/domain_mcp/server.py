@@ -16,7 +16,8 @@ from domain_mcp.checker import get_checker
 from domain_mcp.models import DomainCheckResult
 
 # Public product URL (also used as Host allowlist default).
-DEFAULT_PUBLIC_HOST = "domain-mcp.gietmanic.com"
+DEFAULT_PUBLIC_HOST = "domain.mcp.danielgtmn.com"
+LEGACY_PUBLIC_HOSTS = ("domain-mcp.gietmanic.com",)
 
 
 def _env(name: str, default: str | None = None) -> str | None:
@@ -40,6 +41,9 @@ def _transport_security() -> TransportSecuritySettings | None:
     hosts = [h.strip() for h in extra.split(",") if h.strip()]
     if public_host not in hosts:
         hosts.insert(0, public_host)
+    for legacy in LEGACY_PUBLIC_HOSTS:
+        if legacy not in hosts:
+            hosts.append(legacy)
     # Coolify / local health checks may use container hostnames or IP:port.
     hosts.extend(
         [
@@ -57,6 +61,7 @@ def _transport_security() -> TransportSecuritySettings | None:
         "http://localhost:*",
         "http://127.0.0.1:*",
     ]
+    origins.extend(f"https://{legacy}" for legacy in LEGACY_PUBLIC_HOSTS)
     extra_origins = _env("MCP_ALLOWED_ORIGINS", "") or ""
     origins.extend(o.strip() for o in extra_origins.split(",") if o.strip())
 

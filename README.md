@@ -26,16 +26,18 @@ Uses **RDAP** (structured registry JSON) first, with **WHOIS** fallback when a T
 ## Hosted endpoint
 
 ```text
-https://domain-mcp.gietmanic.com/mcp
+https://domain.mcp.danielgtmn.com/mcp
 ```
 
 | Check | URL |
 |-------|-----|
-| MCP | https://domain-mcp.gietmanic.com/mcp |
-| Health | https://domain-mcp.gietmanic.com/health |
-| Info | https://domain-mcp.gietmanic.com/ |
+| MCP | https://domain.mcp.danielgtmn.com/mcp |
+| Health | https://domain.mcp.danielgtmn.com/health |
+| Info | https://domain.mcp.danielgtmn.com/ |
 
 No install required for the hosted instance — only wire the URL (or a stdio bridge) into your client.
+
+The previous host `https://domain-mcp.gietmanic.com/mcp` remains as an alias.
 
 ---
 
@@ -44,7 +46,7 @@ No install required for the hosted instance — only wire the URL (or a stdio br
 Use the same endpoint everywhere:
 
 ```text
-https://domain-mcp.gietmanic.com/mcp
+https://domain.mcp.danielgtmn.com/mcp
 ```
 
 > **Tip:** After editing config, fully restart the client (quit + reopen). Some hosts only load MCP servers at startup.
@@ -61,7 +63,7 @@ https://domain-mcp.gietmanic.com/mcp
 {
   "mcpServers": {
     "domain-mcp": {
-      "url": "https://domain-mcp.gietmanic.com/mcp"
+      "url": "https://domain.mcp.danielgtmn.com/mcp"
     }
   }
 }
@@ -85,7 +87,7 @@ Claude Desktop is primarily stdio-based. Bridge the remote URL with [`mcp-remote
       "args": [
         "-y",
         "mcp-remote",
-        "https://domain-mcp.gietmanic.com/mcp"
+        "https://domain.mcp.danielgtmn.com/mcp"
       ]
     }
   }
@@ -97,7 +99,7 @@ Restart Claude Desktop. On first run, `npx` downloads `mcp-remote` automatically
 ### Claude Code (CLI)
 
 ```bash
-claude mcp add --transport http domain-mcp https://domain-mcp.gietmanic.com/mcp
+claude mcp add --transport http domain-mcp https://domain.mcp.danielgtmn.com/mcp
 ```
 
 List / remove:
@@ -117,7 +119,7 @@ claude mcp remove domain-mcp
   "servers": {
     "domain-mcp": {
       "type": "http",
-      "url": "https://domain-mcp.gietmanic.com/mcp"
+      "url": "https://domain.mcp.danielgtmn.com/mcp"
     }
   }
 }
@@ -131,7 +133,7 @@ If your VS Code build uses the older `mcpServers` shape, this equivalent also wo
     "servers": {
       "domain-mcp": {
         "type": "http",
-        "url": "https://domain-mcp.gietmanic.com/mcp"
+        "url": "https://domain.mcp.danielgtmn.com/mcp"
       }
     }
   }
@@ -146,7 +148,7 @@ Edit **Windsurf → Settings → Cascade → MCP** or `~/.codeium/windsurf/mcp_c
 {
   "mcpServers": {
     "domain-mcp": {
-      "serverUrl": "https://domain-mcp.gietmanic.com/mcp"
+      "serverUrl": "https://domain.mcp.danielgtmn.com/mcp"
     }
   }
 }
@@ -162,7 +164,7 @@ In the extension MCP settings (often `cline_mcp_settings.json` / Roo MCP config)
 {
   "mcpServers": {
     "domain-mcp": {
-      "url": "https://domain-mcp.gietmanic.com/mcp",
+      "url": "https://domain.mcp.danielgtmn.com/mcp",
       "disabled": false
     }
   }
@@ -176,7 +178,7 @@ If the extension only supports command-based servers, use the `mcp-remote` bridg
   "mcpServers": {
     "domain-mcp": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://domain-mcp.gietmanic.com/mcp"],
+      "args": ["-y", "mcp-remote", "https://domain.mcp.danielgtmn.com/mcp"],
       "disabled": false
     }
   }
@@ -193,7 +195,7 @@ In `~/.continue/config.json` (or assistant config), under `mcpServers` / experim
     {
       "name": "domain-mcp",
       "type": "streamable-http",
-      "url": "https://domain-mcp.gietmanic.com/mcp"
+      "url": "https://domain.mcp.danielgtmn.com/mcp"
     }
   ]
 }
@@ -205,7 +207,7 @@ Exact schema can vary by Continue version — if HTTP type is unsupported, use:
 {
   "name": "domain-mcp",
   "command": "npx",
-  "args": ["-y", "mcp-remote", "https://domain-mcp.gietmanic.com/mcp"]
+  "args": ["-y", "mcp-remote", "https://domain.mcp.danielgtmn.com/mcp"]
 }
 ```
 
@@ -222,7 +224,7 @@ In `~/.config/zed/settings.json` (MCP support depends on Zed version):
         "args": [
           "-y",
           "mcp-remote",
-          "https://domain-mcp.gietmanic.com/mcp"
+          "https://domain.mcp.danielgtmn.com/mcp"
         ]
       }
     }
@@ -239,7 +241,7 @@ Prefer the **stdio bridge** (widest plugin support):
   "mcpServers": {
     "domain-mcp": {
       "command": "npx",
-      "args": ["-y", "mcp-remote", "https://domain-mcp.gietmanic.com/mcp"]
+      "args": ["-y", "mcp-remote", "https://domain.mcp.danielgtmn.com/mcp"]
     }
   }
 }
@@ -252,7 +254,7 @@ Paste into the plugin’s MCP server settings UI if it does not read a JSON file
 If the client only runs local processes:
 
 ```bash
-npx -y mcp-remote https://domain-mcp.gietmanic.com/mcp
+npx -y mcp-remote https://domain.mcp.danielgtmn.com/mcp
 ```
 
 Map that command + args into the client’s MCP config the same way you would any other stdio server.
@@ -267,7 +269,7 @@ If the host sets `DOMAIN_MCP_API_KEY`, send a bearer token.
 {
   "mcpServers": {
     "domain-mcp": {
-      "url": "https://domain-mcp.gietmanic.com/mcp",
+      "url": "https://domain.mcp.danielgtmn.com/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
       }
@@ -286,7 +288,7 @@ If the host sets `DOMAIN_MCP_API_KEY`, send a bearer token.
       "args": [
         "-y",
         "mcp-remote",
-        "https://domain-mcp.gietmanic.com/mcp",
+        "https://domain.mcp.danielgtmn.com/mcp",
         "--header",
         "Authorization: Bearer YOUR_API_KEY"
       ]
@@ -301,7 +303,7 @@ If the host sets `DOMAIN_MCP_API_KEY`, send a bearer token.
 
 | Client | Recommended setup |
 |--------|-------------------|
-| **Cursor** | `"url": "https://domain-mcp.gietmanic.com/mcp"` |
+| **Cursor** | `"url": "https://domain.mcp.danielgtmn.com/mcp"` |
 | **Claude Desktop** | `npx mcp-remote` bridge |
 | **Claude Code** | `claude mcp add --transport http …` |
 | **VS Code / Copilot** | `"type": "http"` + `url` |

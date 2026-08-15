@@ -10,14 +10,14 @@ domain-mcp supports two modes:
 ## Hosted instance
 
 ```text
-https://domain-mcp.gietmanic.com/mcp
+https://domain.mcp.danielgtmn.com/mcp
 ```
 
 | Check | URL |
 |-------|-----|
-| MCP | https://domain-mcp.gietmanic.com/mcp |
-| Health | https://domain-mcp.gietmanic.com/health |
-| Info | https://domain-mcp.gietmanic.com/ |
+| MCP | https://domain.mcp.danielgtmn.com/mcp |
+| Health | https://domain.mcp.danielgtmn.com/health |
+| Info | https://domain.mcp.danielgtmn.com/ |
 
 ### Install on every major client
 
@@ -33,7 +33,7 @@ Minimal patterns:
 {
   "mcpServers": {
     "domain-mcp": {
-      "url": "https://domain-mcp.gietmanic.com/mcp"
+      "url": "https://domain.mcp.danielgtmn.com/mcp"
     }
   }
 }
@@ -49,7 +49,7 @@ Minimal patterns:
       "args": [
         "-y",
         "mcp-remote",
-        "https://domain-mcp.gietmanic.com/mcp"
+        "https://domain.mcp.danielgtmn.com/mcp"
       ]
     }
   }
@@ -59,7 +59,7 @@ Minimal patterns:
 **Claude Code**
 
 ```bash
-claude mcp add --transport http domain-mcp https://domain-mcp.gietmanic.com/mcp
+claude mcp add --transport http domain-mcp https://domain.mcp.danielgtmn.com/mcp
 ```
 
 **Optional API key** (`DOMAIN_MCP_API_KEY` on the server)
@@ -68,7 +68,7 @@ claude mcp add --transport http domain-mcp https://domain-mcp.gietmanic.com/mcp
 {
   "mcpServers": {
     "domain-mcp": {
-      "url": "https://domain-mcp.gietmanic.com/mcp",
+      "url": "https://domain.mcp.danielgtmn.com/mcp",
       "headers": {
         "Authorization": "Bearer YOUR_API_KEY"
       }
@@ -85,7 +85,7 @@ claude mcp add --transport http domain-mcp https://domain-mcp.gietmanic.com/mcp
 | `MCP_HOST` / `HOST` | `127.0.0.1` | Bind address (`0.0.0.0` in Docker) |
 | `MCP_PORT` / `PORT` | `8000` | HTTP port |
 | `MCP_PATH` | `/mcp` | Streamable HTTP path |
-| `MCP_PUBLIC_HOST` | `domain-mcp.gietmanic.com` | Public hostname (Host allowlist + website URL) |
+| `MCP_PUBLIC_HOST` | `domain.mcp.danielgtmn.com` | Public hostname (Host allowlist + website URL). `domain-mcp.gietmanic.com` stays allowed as a legacy alias. |
 | `MCP_STATELESS_HTTP` | `true` | Stateless HTTP (proxy-friendly) |
 | `DOMAIN_MCP_API_KEY` | _(empty)_ | If set, require `Authorization: Bearer …` or `X-API-Key` |
 | `MCP_ALLOWED_HOSTS` | _(derived)_ | Extra comma-separated Host values |
