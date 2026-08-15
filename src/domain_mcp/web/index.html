@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>domain-mcp — look up a name</title>
+    <meta
+      name="description"
+      content="MCP server for domain availability. RDAP first, WHOIS if needed. Not a purchase guarantee."
+    />
+    <link rel="icon" href="/assets/logo.png" type="image/png" />
+    <meta property="og:title" content="domain-mcp" />
+    <meta
+      property="og:description"
+      content="See if a domain is registered. RDAP first, WHOIS if the TLD has no RDAP."
+    />
+    <meta property="og:image" content="/assets/logo.png" />
+    <style>
+      @font-face {
+        font-family: "Bricolage";
+        src: url("/assets/fonts/bricolage-600.woff2") format("woff2");
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Public Sans";
+        src: url("/assets/fonts/public-sans-400.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Public Sans";
+        src: url("/assets/fonts/public-sans-500.woff2") format("woff2");
+        font-weight: 500;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        src: url("/assets/fonts/ibm-plex-mono-400.woff2") format("woff2");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      :root {
+        --paper: #dce4df;
+        --ink: #17211e;
+        --mute: #56615c;
+        --rule: #b3bfb8;
+        --panel: #eef3ef;
+        --available: #1c6b50;
+        --taken: #8a3a30;
+        --unknown: #6a5a2e;
+        --focus: #1c6b50;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100dvh;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Public Sans", ui-sans-serif, system-ui, sans-serif;
+        font-size: 1.05rem;
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      a:hover {
+        color: var(--available);
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 3px;
+      }
+
+      .wrap {
+        width: min(40rem, calc(100% - 2.5rem));
+        margin: 0 auto;
+        padding: 1.75rem 0 3.5rem;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        text-decoration: none;
+      }
+
+      .brand img {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+      }
+
+      .brand strong {
+        font-weight: 500;
+        letter-spacing: -0.03em;
+      }
+
+      nav {
+        display: flex;
+        gap: 1.1rem;
+        font-size: 0.88rem;
+        color: var(--mute);
+      }
+
+      h1 {
+        margin: 2.2rem 0 0.55rem;
+        font-size: 1.35rem;
+        font-weight: 500;
+        letter-spacing: -0.03em;
+      }
+
+      .lede {
+        margin: 0 0 1.4rem;
+        color: var(--mute);
+        max-width: 32rem;
+      }
+
+      form {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+      }
+
+      input[type="text"] {
+        flex: 1;
+        min-width: 0;
+        height: 3rem;
+        padding: 0 0.9rem;
+        border: 1px solid var(--rule);
+        border-radius: 2px;
+        background: var(--panel);
+        color: var(--ink);
+        font: 400 1rem/1.2 "IBM Plex Mono", ui-monospace, monospace;
+      }
+
+      input[type="text"]::placeholder {
+        color: #8a968f;
+      }
+
+      button {
+        height: 3rem;
+        padding: 0 1.05rem;
+        border: 0;
+        border-radius: 2px;
+        background: var(--ink);
+        color: var(--paper);
+        font: 500 0.92rem/1 "Public Sans", sans-serif;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #0d1412;
+      }
+
+      button:disabled {
+        opacity: 0.55;
+        cursor: wait;
+      }
+
+      .verdict {
+        min-height: 7.2rem;
+        margin: 1.75rem 0 0.35rem;
+      }
+
+      .verdict[data-state="empty"] .word {
+        color: #9aa59e;
+      }
+
+      .verdict[data-state="available"] .word {
+        color: var(--available);
+      }
+
+      .verdict[data-state="registered"] .word {
+        color: var(--taken);
+      }
+
+      .verdict[data-state="unknown"],
+      .verdict[data-state="invalid"],
+      .verdict[data-state="error"],
+      .verdict[data-state="unsupported"] {
+        color: var(--unknown);
+      }
+
+      .word {
+        margin: 0;
+        font-family: "Bricolage", "Public Sans", sans-serif;
+        font-weight: 600;
+        font-size: clamp(3.4rem, 14vw, 7.4rem);
+        letter-spacing: -0.055em;
+        line-height: 0.86;
+        text-transform: lowercase;
+      }
+
+      .meta {
+        margin: 0.55rem 0 0;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 0.82rem;
+        color: var(--mute);
+      }
+
+      .zone {
+        margin-top: 2.4rem;
+        padding-top: 1.3rem;
+        border-top: 1px solid var(--rule);
+      }
+
+      .zone-label {
+        margin: 0 0 0.45rem;
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--mute);
+      }
+
+      .zone-row {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.7rem 0.8rem;
+        background: var(--panel);
+        border: 1px solid var(--rule);
+      }
+
+      .zone-row code {
+        flex: 1;
+        min-width: 0;
+        overflow-x: auto;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 0.84rem;
+        white-space: nowrap;
+      }
+
+      .copy {
+        height: 2rem;
+        padding: 0 0.7rem;
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--rule);
+        font-size: 0.75rem;
+      }
+
+      .copy:hover {
+        background: var(--paper);
+      }
+
+      .snippet {
+        margin-top: 0.65rem;
+      }
+
+      .snippet pre {
+        margin: 0;
+        padding: 0.75rem 0.8rem;
+        overflow-x: auto;
+        background: var(--ink);
+        color: var(--panel);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 0.78rem;
+        line-height: 1.45;
+      }
+
+      footer {
+        margin-top: 2.2rem;
+        color: var(--mute);
+        font-size: 0.86rem;
+      }
+
+      footer p {
+        margin: 0 0 0.4rem;
+      }
+
+      @media (max-width: 560px) {
+        form {
+          flex-direction: column;
+        }
+
+        button[type="submit"] {
+          width: 100%;
+        }
+
+        .wrap {
+          width: min(40rem, calc(100% - 1.6rem));
+        }
+      }
+
+      @media (prefers-reduced-motion: no-preference) {
+        .word {
+          transition: color 160ms ease;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a class="brand" href="/">
+          <img src="/assets/logo.png" width="36" height="36" alt="" />
+          <strong>domain-mcp</strong>
+        </a>
+        <nav>
+          <a href="{{SITE}}">danielgtmn.com</a>
+          <a href="{{DOCS}}">GitHub</a>
+          <a href="{{DOCS}}/wiki">Docs</a>
+        </nav>
+      </header>
+
+      <h1>See if a name is registered</h1>
+      <p class="lede">
+        RDAP first. WHOIS if the TLD has no RDAP. Available is a signal, not a
+        purchase guarantee.
+      </p>
+
+      <form id="lookup" action="/api/check" method="get">
+        <label for="domain">Domain name</label>
+        <input
+          id="domain"
+          name="domain"
+          type="text"
+          inputmode="url"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="example.com"
+          required
+        />
+        <button type="submit">Look up</button>
+      </form>
+
+      <section class="verdict" data-state="empty" aria-live="polite">
+        <p class="word" id="word">look up</p>
+        <p class="meta" id="meta">Type a domain. Result stays on this page.</p>
+      </section>
+
+      <section class="zone">
+        <p class="zone-label">MCP</p>
+        <div class="zone-row">
+          <code id="mcp-url">{{MCP_URL}}</code>
+          <button class="copy" type="button" data-copy="{{MCP_URL}}">Copy</button>
+        </div>
+        <div class="snippet">
+          <pre id="cli">claude mcp add --transport http domain-mcp {{MCP_URL}}</pre>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          Confirm at a registrar before buying. Premium and reserved names can
+          still be blocked.
+        </p>
+        <p>
+          v{{VERSION}} ·
+          <a href="{{SITE}}">danielgtmn.com</a> ·
+          <a href="mailto:hello@danielgtmn.com">hello@danielgtmn.com</a>
+        </p>
+      </footer>
+    </div>
+    <script>
+      const form = document.getElementById("lookup");
+      const input = document.getElementById("domain");
+      const word = document.getElementById("word");
+      const meta = document.getElementById("meta");
+      const verdict = document.querySelector(".verdict");
+      const submit = form.querySelector('button[type="submit"]');
+
+      const labels = {
+        available: "available",
+        registered: "taken",
+        unknown: "unknown",
+        invalid: "invalid",
+        unsupported: "unsupported",
+        error: "error",
+      };
+
+      function setBusy(busy) {
+        submit.disabled = busy;
+        submit.textContent = busy ? "Looking up" : "Look up";
+      }
+
+      function render(data) {
+        const status = data.status || "error";
+        verdict.dataset.state = status;
+        word.textContent = labels[status] || status;
+
+        const parts = [data.unicode_domain || data.domain];
+        if (data.method && data.method !== "none") parts.push(data.method);
+        if (data.registrar) parts.push(data.registrar);
+        if (data.message && status !== "available" && status !== "registered") {
+          meta.textContent = data.message;
+          return;
+        }
+        meta.textContent = parts.filter(Boolean).join(" · ");
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const domain = input.value.trim();
+        if (!domain) {
+          input.focus();
+          return;
+        }
+        setBusy(true);
+        try {
+          const res = await fetch(
+            "/api/check?domain=" + encodeURIComponent(domain)
+          );
+          const data = await res.json();
+          render(data);
+        } catch (err) {
+          render({
+            status: "error",
+            message: "Lookup failed. Check the connection and try again.",
+          });
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      document.querySelectorAll("[data-copy]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const value = btn.getAttribute("data-copy") || "";
+          try {
+            await navigator.clipboard.writeText(value);
+            const prev = btn.textContent;
+            btn.textContent = "Copied";
+            setTimeout(() => {
+              btn.textContent = prev;
+            }, 1400);
+          } catch {
+            btn.textContent = "Copy failed";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

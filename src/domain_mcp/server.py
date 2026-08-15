@@ -10,9 +10,10 @@ from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
-from starlette.responses import JSONResponse, Response
+from starlette.responses import HTMLResponse, JSONResponse, Response
 
 from domain_mcp.checker import get_checker
+from domain_mcp.landing import asset_response, info_payload, render_landing, wants_html
 from domain_mcp.models import DomainCheckResult
 
 # Public product URL (also used as Host allowlist default).
@@ -222,7 +223,10 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:  # noqa: ANN001
         # Health / root probes without auth so Coolify & monitors work.
-        if request.url.path in {"/", "/health", "/healthz", "/ready"}:
+        path = request.url.path
+        if path in {"/", "/health", "/healthz", "/ready", "/info", "/api/check"} or path.startswith(
+            "/assets/"
+        ):
             return await call_next(request)
 
         auth = request.headers.get("authorization", "")
@@ -241,23 +245,43 @@ class ApiKeyMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 
+def _public_host() -> str:
+    return _env("MCP_PUBLIC_HOST", DEFAULT_PUBLIC_HOST) or DEFAULT_PUBLIC_HOST
+
+
+def _mcp_path() -> str:
+    return _env("MCP_PATH", "/mcp") or "/mcp"
+
+
 def _attach_http_routes() -> None:
-    """Add lightweight health endpoints for reverse proxies."""
+    """Browser landing, JSON info, and health endpoints."""
 
     @mcp.custom_route("/", methods=["GET"])
-    async def root(_request: Request) -> JSONResponse:
-        public = _env("MCP_PUBLIC_HOST", DEFAULT_PUBLIC_HOST) or DEFAULT_PUBLIC_HOST
-        path = _env("MCP_PATH", "/mcp") or "/mcp"
-        return JSONResponse(
-            {
-                "name": "domain-mcp",
-                "version": "0.1.0",
-                "transport": "streamable-http",
-                "mcp_endpoint": path,
-                "docs": "https://github.com/danielgtmn/domain-mcp",
-                "url": f"https://{public}{path}",
-            }
-        )
+    async def root(request: Request) -> Response:
+        host = _public_host()
+        path = _mcp_path()
+        if wants_html(request):
+            return HTMLResponse(render_landing(host=host, mcp_path=path))
+        return JSONResponse(info_payload(host=host, mcp_path=path))
+
+    @mcp.custom_route("/info", methods=["GET"])
+    async def info(_request: Request) -> JSONResponse:
+        return JSONResponse(info_payload(host=_public_host(), mcp_path=_mcp_path()))
+
+    @mcp.custom_route("/api/check", methods=["GET"])
+    async def api_check(request: Request) -> JSONResponse:
+        domain = (request.query_params.get("domain") or "").strip()
+        if not domain:
+            return JSONResponse(
+                {"error": "missing_domain", "message": "Pass ?domain=example.com"},
+                status_code=400,
+            )
+        result = get_checker().check(domain, include_raw=False, use_cache=True)
+        return JSONResponse(result.to_dict())
+
+    @mcp.custom_route("/assets/{name:path}", methods=["GET"])
+    async def assets(request: Request) -> Response:
+        return asset_response(request.path_params["name"])
 
     @mcp.custom_route("/health", methods=["GET"])
     @mcp.custom_route("/healthz", methods=["GET"])

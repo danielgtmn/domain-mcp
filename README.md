@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/logo-256.png" alt="domain-mcp" width="128" height="128">
+</p>
+
 # domain-mcp
 
 [![CI](https://github.com/danielgtmn/domain-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/danielgtmn/domain-mcp/actions/workflows/ci.yml)
@@ -33,7 +37,8 @@ https://domain.mcp.danielgtmn.com/mcp
 |-------|-----|
 | MCP | https://domain.mcp.danielgtmn.com/mcp |
 | Health | https://domain.mcp.danielgtmn.com/health |
-| Info | https://domain.mcp.danielgtmn.com/ |
+| Landing (browser) | https://domain.mcp.danielgtmn.com/ |
+| Info (JSON) | https://domain.mcp.danielgtmn.com/info |
 
 No install required for the hosted instance — only wire the URL (or a stdio bridge) into your client.
 

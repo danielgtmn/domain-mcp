@@ -10,7 +10,7 @@
 
 Please **do not** open a public issue for security problems.
 
-Email the maintainer (see GitHub profile / `pyproject.toml` authors) or use [GitHub private vulnerability reporting](https://github.com/danielgtmn/domain-mcp/security/advisories/new) if enabled.
+Email [hello@danielgtmn.com](mailto:hello@danielgtmn.com) or use [GitHub private vulnerability reporting](https://github.com/danielgtmn/domain-mcp/security/advisories/new) if enabled.
 
 Include:
 
